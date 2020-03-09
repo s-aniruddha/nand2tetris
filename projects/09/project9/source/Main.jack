@@ -1,0 +1,12 @@
+/**
+ * This is the main class of the jumper/obstacle game.
+ */
+class Main{
+    function void main() { 
+        var GamePlay gameplay;
+        let gameplay = GamePlay.new();
+        do gameplay.Game();
+        do gameplay.dispose();
+        return;        
+    }
+}

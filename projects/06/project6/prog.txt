@@ -1,0 +1,219 @@
+// File: assemblerns.py
+
+# opcode table from chapter 6 of "nand2tetris book"
+
+comptable = {
+    '0' : '0101010',
+    '1' : '0111111',
+    '-1': '0111010',
+    'D' : '0001100',
+    'A' : '0110000',
+    '!D': '0001101',
+    '!A': '0110001',
+    '-D': '0001111',
+    '-A': '0110011',
+    'D+1':'0011111',
+    'A+1':'0110111',
+    'D-1':'0001110',
+    'A-1':'0110010',
+    'D+A':'0000010',
+    'D-A':'0010011',
+    'A-D':'0000111',
+    'D&A':'0000000',
+    'D|A':'0010101',
+    'M' : '1110000',
+    '!M': '1110001',
+    '-M': '1110011',
+    'M+1':'1110111',
+    'M-1':'1110010',
+    'D+M':'1000010',
+    'D-M':'1010011',
+    'M-D':'1000111',
+    'D&M':'1000000',
+    'D|M':'1010101'
+    }
+
+# strip whitespaces everywhere in a given string
+def stripspaces(s):
+    res = ''
+    for i in s:
+        if not i.isspace():
+            res += i
+    return res
+
+# assemble code from input file (infile) and generate machine code into outfile
+def assemblerns(infile, outfile):
+
+    print("assembling -> ", infile)
+    print("output -> ", outfile)
+
+    with open (infile,"r") as fin:
+        with open (outfile,"w") as fout:
+            for line in fin:
+                line = stripspaces(line)
+
+                # ignore empty lines
+                if line == "":
+                    continue        
+                elif len(line) >= 2 and line[0:2] == r"//": # ignore comment lines
+                    continue
+                elif line[0] == '@' : # A command
+                    binary = bin(int(line[1:]))
+                    excesszero = 16 - len(binary[2:])
+                    # make sure that is 16 bit length
+                    for i in range(excesszero):
+                        fout.write('0')
+                    fout.write( binary[2:] + '\n')
+                else: # C command
+                      list1 = line.split('=')
+                      d1 = '0'
+                      d2 = '0'
+                      d3 = '0'
+                      if len(list1) == 2:
+                          if 'A' in list1[0]:
+                              d1 = '1'
+                          if 'D' in list1[0]:
+                              d2 = '1'
+                          if 'M' in list1[0]:
+                              d3 = '1' 
+                          list2 = list1[1].split(';')
+                      else:
+                          list2 = list1[0].split(';')
+
+                      j1 = '0'
+                      j2 = '0'
+                      j3 = '0'
+                      if len(list2) == 2:
+                            if 'J' in list2[1] :
+                                if 'G' in list2[1] or 'M' in list2[1] or 'N' in list2[1] :
+                                    j3 = '1'
+                                if 'L' in list2[1] or 'M' in list2[1] or 'N' in list2[1] :  
+                                    j1 = '1'   
+                                if  'M' in list2[1] or ('E' in list2[1] and 'N' not in list2[1]) :    
+                                    j2 = '1'
+                      ac1c2c3c4c5c6 = comptable[list2[0]]
+                      fout.write( "111" + ac1c2c3c4c5c6 + d1 + d2 + d3 + j1 + j2 + j3 + '\n') 
+
+
+import sys
+
+# pass input, output filenames from command line
+assemblerns(infile=sys.argv[1], outfile=sys.argv[2])
+
+// File: assembler.py
+
+
+
+
+def stripspaces(s):
+    res = ''
+    for i in s:
+        if not i.isspace():
+            res += i
+    return res
+
+def isnumber(s):
+    try:
+        int(s)
+        return True
+    except:
+        return False
+
+def assembler(infile, outfile):
+    symboltable = {
+    'R0' : '0',
+    'R1' : '1',
+    'R2' : '2',
+    'R3' : '3',
+    'R4' : '4',
+    'R5' : '5',
+    'R6' : '6',
+    'R7' : '7',
+    'R8' : '8',
+    'R9' : '9',
+    'R10' : '10',
+    'R11' : '11',
+    'R12' : '12',
+    'R13' : '13',
+    'R14' : '14',
+    'R15' : '15',
+    'SCREEN' :  '16384',
+    'KBD' :  '24576',
+    'SP' : '0',
+    'LCL' : '1',
+    'ARG' : '2',
+    'THIS' : '3',
+    'THAT' : '4',
+    'LOOP' : '4',
+    'STOP' : '18',
+    'END' : '22',
+    'i' : '16',
+    'sum' : '17'
+    }
+    
+    with open (infile,"r") as fin:
+            linenumber = -1
+            for line in fin: #first iteration to find all the labels
+                line1 = stripspaces(line)
+                if line1 == "":
+                    continue
+                if line1[0:2] == '//':
+                    continue    
+                label1 = ''
+                
+                if line1[0] == '(':
+                    for i in line1:
+                        if i != "(" and i != ")":
+                            label1 += i 
+                    symboltable[label1] = str(linenumber + 1) 
+                      
+                else:
+                    linenumber += 1   
+    
+    with open (infile,"r") as fin:       
+            count = 16 
+            for line in fin:
+                line1 = stripspaces(line)
+                if line1 == "":
+                    continue
+                if line1[0:2] == '//':
+                    continue    
+                if line1[0] == '@':
+                    sym = line1[1:]
+                    if (not isnumber(sym)) and (sym not in symboltable):
+                        symboltable[sym] = str(count)
+                        count += 1
+
+
+    with open (infile,"r") as fin:
+        with open (outfile,"w") as fout:
+            for line2 in fin:
+                line3 = stripspaces(line2)
+                if line3 == "":
+                    continue
+                elif line3[0:2] == '//':
+                    continue    
+                elif line3[0] == '@':
+                    idx = line3.find("//")
+                    if idx == -1:
+                        idx = len(line3)
+                    sym = line3[1:idx]
+                    if sym not in symboltable:
+                        fout.write('@' + sym + '\n')
+                    else:
+                        fout.write('@'+ symboltable[sym]+'\n') 
+                elif line3[0] != '(':
+                    idx = line3.find("//")
+                    if idx == -1:
+                        idx = len(line3)
+                    fout.write(line3[0:idx]+ '\n') 
+            
+
+
+import sys
+# pass input, output filenames from command line
+assembler(infile=sys.argv[1],outfile=sys.argv[2])
+
+               
+
+                  

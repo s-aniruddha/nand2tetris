@@ -1,0 +1,71 @@
+/**
+ * Represents all the obstacles. Right now, the game has only
+ * one obstacle. This class can be modified to add more obstacles.
+ * This class manages collision between the jumper and the obstacle(s).
+ */
+class ObstacleSet {
+    field Obstacle obstacle01; // only one obstacle for now!
+
+    constructor ObstacleSet new() {
+        let obstacle01 = Obstacle.new();
+        return this;
+    }
+
+    method void dispose() {
+        do obstacle01.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void run(Jumper j) {
+        do obstacle01.run(j);
+        do handleCollision(j);
+        return;
+    }
+
+    method void fire(int x, int y, Jumper j) {
+        if (~obstacle01.getActive()) {
+            do obstacle01.fire(x, y,j);
+        } 
+        return;
+    }
+
+    method boolean collision(Obstacle b, Jumper j) {
+        var int bx, by, jx, jheight;
+
+        if (~b.getActive()) {
+            return false;
+        }
+
+        if (~j.getAlive()) {
+            return false;
+        }
+
+        let bx = b.getX();
+        let by = b.getY();
+        let jx = j.getX();
+        let jheight = j.getheight();
+        if (jheight < 10) { 
+            if (bx < (jx + 32)) {
+                if (bx > (jx - 32)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    method void kill(Obstacle b, Jumper j) {
+        do j.kill();
+        do b.deactivate(); 
+        return;
+    }
+
+    method void handleCollision(Jumper j) {
+        if (collision(obstacle01, j)) {
+            do kill(obstacle01, j);
+        } 
+        return;
+    }
+}

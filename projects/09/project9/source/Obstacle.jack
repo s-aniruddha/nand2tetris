@@ -1,0 +1,93 @@
+/**
+ * This class represents an obstacle. Manages movement
+ * and position of an obstacle.
+ */
+class Obstacle {
+    field int x, y; // location of obstacle
+    field boolean Active;
+
+    constructor Obstacle new() {
+        let x = 0;
+        let y = 0;
+        return this;
+    }
+
+ 
+    method void setXY(int Ax, int Ay) {
+        let x = Ax;
+        let y = Ay;
+        return;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method boolean getActive() {
+        return Active;
+    }
+
+    method void draw() {
+        do Screen.drawRectangle(x,y,x+32,y+10);
+        return;
+    }
+
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x,y,x+32,y+10);
+        do Screen.setColor(true);
+        return;
+    }
+
+    method void fire(int Ax, int Ay,Jumper j) {
+        do setXY(Ax, Ay);
+        do activate(j);
+        return;
+    }
+
+    method void run(Jumper j) {
+        if (Active) {
+            do move(j);
+        }
+        return;
+    }
+
+    method void activate(Jumper j) {
+        let Active = true;
+        do move(j);
+        return;
+    }
+
+    method void deactivate() {
+        let Active = false;
+        do erase();
+        return;
+    }
+
+    method void move (Jumper j) {
+        if (~Active) {
+            return;
+        }
+
+        if (x > 1) {
+            do erase();
+            let x = x - 2;
+            do draw();
+        } else {
+            do j.erase();
+            do j.setposition(0,0);
+            do j.draw();
+            do deactivate();
+        }
+        return;
+    }
+}

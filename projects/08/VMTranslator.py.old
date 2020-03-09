@@ -1,0 +1,211 @@
+returnindex = 1 
+
+def codewriter(words, labelcount, fout,word):
+        #fout.write("//")
+        currentfunction = ""
+        global returnindex 
+        #for i in words:
+        #     fout.write(i + ' ')
+        #fout.write('\n')      #writes appropriate comment statements
+        if words[0] == "push":
+            location = words[1]
+            offset = words[2]
+            if location == "constant":
+                fout.write('@'+ offset + '\n' + 'D=A' + '\n')
+            elif location == "local":
+                fout.write('@' + 'LCL' + '\n' + 'D=M' + '\n' + '@' + offset + '\n' + 'A=D+A' + '\n' + 'D=M' + '\n')  
+            elif location == "argument":
+                fout.write('@'+ 'ARG' + '\n' + 'D=M' + '\n' + '@' + offset + '\n' + 'A=D+A' + '\n' + 'D=M' + '\n')  
+            elif location == "this": 
+                fout.write('@'+ 'THIS' + '\n' + 'D=M' + '\n' + '@' + offset + '\n' + 'A=D+A' + '\n' + 'D=M' + '\n')  
+            elif location == "that": 
+                fout.write('@'+ 'THAT' + '\n' + 'D=M' + '\n' + '@' + offset + '\n' + 'A=D+A' + '\n' + 'D=M' + '\n')  
+            elif location == "static":
+                fout.write('@'+'foo.' + offset + '\n' + 'D=M' + '\n') 
+            elif location == "temp":
+                fout.write('@'+ 'R5' + '\n' + 'D=M' + '\n'+ '@' + str(int(offset) + 5) + '\n' +'A=D+A' + '\n' +'D=M'  +'\n')
+            elif location == "pointer":
+                if offset == '0':
+                    fout.write('@' + 'THIS' + '\n' + 'D=M' + '\n')
+                else:
+                    fout.write('@' + 'THAT' + '\n' + 'D=M' + '\n')
+            fout.write('@SP' + '\n' + 'A=M' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'M=M+1' + '\n') 
+
+
+        elif words[0] == "pop":
+            location1 = words[1]
+            offset1 = words[2]
+            if location1 == "local":
+                fout.write('@' + 'LCL' + '\n' + 'D=M' + '\n' + '@' + offset1 + '\n' + 'D=D+A' +'\n'+ '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n')  
+            elif location1 == "argument": 
+                fout.write('@'+ 'ARG' + '\n' + 'D=M' + '\n' + '@' + offset1 + '\n' + 'D=D+A' +'\n'+ '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+            elif location1 == "this": 
+                fout.write('@'+ 'THIS' + '\n' + 'D=M' + '\n' + '@' + offset1 + '\n' + 'D=D+A' +'\n'+ '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+            elif location1 == "that": 
+                fout.write('@'+ 'THAT' + '\n' + 'D=M' + '\n' + '@' + offset1 + '\n' + 'D=D+A' +'\n'+ '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+            elif location1 == "static":
+                fout.write('@'+'foo.' + offset1 + '\n' + 'D=A' + '\n' + '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+            elif location1 == "temp":
+                fout.write('@'+ 'R5' + '\n' + 'D=M' + '\n' + '@' + str(int(offset1) + 5) + '\n' + 'D=D+A' +'\n'+ '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+            elif location1 == "pointer":
+                if offset1 == '0':
+                    fout.write('@' + 'THIS' + '\n' + 'D=A' + '\n' + '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+                else:
+                    fout.write('@' + 'THAT' + '\n' + 'D=A' + '\n' + '@R13' + '\n' + 'M=D' + '\n' + '@SP' + '\n' + 'AM=M-1' + '\n' + 'D=M' + '\n' + '@R13' '\n' + 'A=M' + '\n' + 'M=D' + '\n') 
+
+
+        elif words[0] == "label":
+            labelname = words[1]
+            fout.write('(' + currentfunction + '$' + labelname + ')\n')
+
+        elif words[0] == "goto":
+            labelnamedest = words[1]
+            fout.write('@' + currentfunction + '$' +labelnamedest + '\n' + '0;JMP\n') 
+
+        elif words[0] == "if-goto":
+            labelnamedest = words[1]
+            fout.write('@SP\nAM=M-1\nD=M\n@' + currentfunction + '$' + labelnamedest + '\n' + 'D;JNE\n')
+
+
+        elif words[0] == "function":
+            functionname = words[1]
+            currentfunction = functionname
+            lclcount = int(words[2])
+            fout.write('('+ functionname + ')\n')    
+            for i in range(lclcount):
+                fout.write('@'+ '0' + '\nD=A\n')
+                fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')  
+
+        elif words[0] == "call":
+            functionname1 = words[1] 
+            noofargs = words[2]
+            fout.write('@' + "returnaddress" + str(returnindex) + '\nD=A\n')
+            fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+            fout.write('@' + "LCL" + '\nD=M\n')
+            fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+            fout.write('@' + "ARG" + '\nD=M\n')
+            fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+            fout.write('@' + "THIS" + '\nD=M\n')
+            fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+            fout.write('@' + "THAT" + '\nD=M\n')
+            fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n') 
+            fout.write('@' + "SP" + '\nD=M\n')
+            fout.write('@5' + '\nD=D-A\n')  
+            fout.write('@' + noofargs + "\nD=D-A\n")           
+            fout.write('@' + "ARG" + '\nM=D\n')
+            fout.write('@' + "SP" + '\nD=M\n')
+            fout.write('@' + "LCL" + '\nM=D\n')
+            fout.write('@' + functionname1 + '\n0;JMP\n') 
+            fout.write('(' + "returnaddress" + str(returnindex) + ')\n')   
+            returnindex += 1 
+
+        elif words[0] == "return":
+            fout.write('@' + "LCL" + '\nD=M\n') 
+            fout.write('@' + "R11" + '\nM=D\n')
+
+            fout.write('@5\nA=D-A\nD=M\n') 
+            fout.write('@' + "R12" + '\nM=D\n')   
+
+            fout.write('@ARG\nD=M\n@0\nD=D+A\n@R13\nM=D\n@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n') 
+
+            fout.write('@ARG\nD=M\n@SP\nM=D+1\n')
+
+            fout.write("@R11\nD=M-1\nAM=D\nD=M\n")
+            fout.write('@' + "THAT" + '\nM=D\n') 
+
+            fout.write('@R11\nD=M-1\nAM=D\nD=M\n') 
+            fout.write('@' + "THIS" + '\nM=D\n')   
+
+            fout.write('@R11\nD=M-1\nAM=D\nD=M\n') 
+            fout.write('@' + "ARG" + '\nM=D\n')
+
+            fout.write('@R11\nD=M-1\nAM=D\nD=M\n') 
+            fout.write('@' + "LCL" + '\nM=D\n') 
+            
+
+            fout.write('@R12\nA=M\n0;JMP\n')                         
+                
+        else:
+            operation = words[0]
+            if operation == 'add':
+                 fout.write('@SP' + '\n' +  'AM=M-1' + '\n' + 'D=M' + '\n' + 'A=A-1' + '\n' + 'M=D+M'+ '\n')
+            elif operation == 'sub':
+                 fout.write('@SP' + '\n' +  'AM=M-1' + '\n' + 'D=M' + '\n' + 'A=A-1' + '\n' + 'M=M-D' + '\n')    
+            elif operation == 'neg':
+                 fout.write('@SP' + '\n' +  'A=M-1' + '\n' + 'M=-M'+'\n')                   
+            elif operation == 'and':
+                 fout.write('@SP' + '\n' +  'AM=M-1' + '\n' + 'D=M' + '\n' + 'A=A-1' + '\n' + 'M=D&M')
+            elif operation == 'or':
+                 fout.write('@SP' + '\n' +  'AM=M-1' + '\n' + 'D=M' + '\n' + 'A=A-1' +  '\n'+ 'M=D|M')              
+            elif operation == 'not':
+                 fout.write('@SP' + '\n' +  'A=M-1' + '\n' + 'M=!M'+'\n') 
+            else:
+                 fout.write('@SP' + '\n' +  'AM=M-1' + '\n' + 'D=M' + '\n' + 'A=A-1' + '\n' + 'MD=M-D' + '\n' + '@TRUE' + str(labelcount) + '\n' + 'D;') 
+                 if operation == 'eq':
+                   fout.write('JEQ' + '\n')
+                 elif operation == 'lt':
+                   fout.write('JLT' + '\n')
+                 elif operation == 'gt':
+                   fout.write('JGT' + '\n')            
+                 fout.write('(FALSE' + str(labelcount) + ')' + '\n' + '@SP'  + '\n' + 'A=M-1' + '\n' + 'M=0' + '\n' + '@NEXT'+ str(labelcount) + '\n' + '0;JMP' + '\n') 
+                 fout.write('(TRUE' + str(labelcount) + ')' + '\n' + '@SP'  + '\n' + 'A=M-1' + '\n' + 'M=-1' + '\n' + '@NEXT'+ str(labelcount) + '\n' + '0;JMP' + '\n')
+                 fout.write('(NEXT' + str(labelcount) + ')' + '\n') 
+            labelcount = labelcount + 1
+     
+        return labelcount
+
+
+def emitbootcode(fout):
+    fout.write('@256\nD=A\n@SP\nM=D\n') 
+    fout.write('@' + "returnaddress" + str(0) + '\nD=A\n')
+    fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+    fout.write('@' + "LCL" + '\nD=M\n')
+    fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+    fout.write('@' + "ARG" + '\nD=M\n')
+    fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+    fout.write('@' + "THIS" + '\nD=M\n')
+    fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n')
+    fout.write('@' + "THAT" + '\nD=M\n')
+    fout.write('@SP\nA=M\nM=D\n@SP\nM=M+1\n') 
+    fout.write('@' + "SP" + '\nD=M\n')
+    fout.write('@5' + '\nD=D-A\n')  
+    fout.write('@' + '0' + "\nD=D-A\n")           
+    fout.write('@' + "ARG" + '\nM=D\n')
+    fout.write('@' + "SP" + '\nD=M\n')
+    fout.write('@' + "LCL" + '\nM=D\n')
+    fout.write('@' + 'Sys.init' + '\n0;JMP\n') 
+    fout.write('(' + "returnaddress" + str(0) + ')\n')   
+
+def VM1(infile, outfile, word):
+    lines = []
+    labelcount = 0
+    with open (infile,"r") as fin:
+        for line in fin:
+            if line == "" or line == "\n":
+                continue
+            if line[0:2] == '//': #handle comments and empty lines
+                continue   
+            lines.append(line) 
+
+    with open (outfile,"a") as fout:
+        for i in lines:
+            words = i.split() #list of words
+            labelcount = codewriter(words, labelcount,fout,word)
+ 
+
+import sys
+import os
+
+# pass input directory as command line argument
+indir = os.path.abspath(sys.argv[1])
+outpath = indir + os.sep + os.path.basename(indir) + ".asm"
+
+for infile in os.listdir(indir):
+    if infile.endswith(".vm"):
+        idx = infile.find(".vm")
+        if os.path.exists(outpath):
+            os.remove(outpath)
+        word = infile[0:idx]
+        with open (outpath, "a") as fout:
+            emitbootcode(fout)
+        VM1(indir + os.sep + infile, outpath, word)

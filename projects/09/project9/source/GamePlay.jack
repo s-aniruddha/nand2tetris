@@ -1,0 +1,94 @@
+/**
+ * This class has the main loop of the game.
+ */
+class GamePlay {
+    field Jumper jumper;
+    field ObstacleSet obstacleset;
+    field int skipTurnsBetweenShots;
+    field int enemyFloatInterval; 
+    field boolean exit; //true when GameOver
+
+    constructor GamePlay new() {
+        let jumper = Jumper.new();
+        let obstacleset = ObstacleSet.new() ; 
+        let exit = false;  
+        return this;
+    }
+
+    method void dispose() {
+        do jumper.dispose();
+        do obstacleset.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void endGame(String text) { 
+        // do Screen.clearScreen();
+        do Output.moveCursor(10, 30);
+        do Output.printString(text);
+        return;
+    }
+
+    method void DrawArena() {
+        do Screen.drawCircle(80,40,20);
+        do Screen.setColor(false);
+        do Screen.drawCircle(100, 40, 30);
+        do Screen.setColor(true);
+        do Screen.drawRectangle(0,224,511,255);
+
+        do Screen.drawLine(0,110,120,110);
+        do Screen.drawLine(120,90,120,110);
+        do Screen.drawLine(120,90,250,90);
+        do Screen.drawLine(250,60,250,90);
+        do Screen.drawLine(250,60,390,60);
+        do Screen.drawLine(390,60,390,120);
+        do Screen.drawLine(390,120,511,120);
+
+        do Screen.drawRectangle(30,120,40,130);
+        do Screen.drawRectangle(60,120,70,130);
+
+        do Screen.drawRectangle(150,100,160,110);
+        do Screen.drawRectangle(180,100,190,110);
+        do Screen.drawRectangle(210,100,220,110);
+
+        do Screen.drawRectangle(280,90,290,100);
+        do Screen.drawRectangle(310,90,320,100);
+        do Screen.drawRectangle(340,90,350,100);
+        do Screen.drawRectangle(280,110,290,120);
+        do Screen.drawRectangle(310,110,320,120);
+        do Screen.drawRectangle(340,110,350,120);
+
+        do Screen.drawRectangle(420,130,430,140);
+        do Screen.drawRectangle(450,130,460,140);
+        do Screen.drawRectangle(480,130,490,140);
+
+        return;
+    }
+  
+    method void Game() { 
+        var char key;
+        var int go;  
+        var int obsMoveCount; 
+        let go = 0;
+        let key = 0;  
+        let obsMoveCount = 0;
+        do DrawArena();
+        while (~exit)  {
+            let key = Keyboard.keyPressed();  
+            if (key = 131) {
+                let exit = ~jumper.run();
+            }
+            if (obsMoveCount > 135) {
+                let obsMoveCount = 0;
+            } else {
+                if (obsMoveCount = 0) {
+                    do obstacleset.fire(479,213,jumper);
+                    do obstacleset.run(jumper);
+                    let exit = ~jumper.getAlive();
+                }
+                let obsMoveCount = obsMoveCount + 1;
+            }
+        } //while
+        return;       
+    } //end of Game
+}

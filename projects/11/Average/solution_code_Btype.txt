@@ -1,0 +1,38 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+void applyDrug() {
+	int n;
+	cin >> n;
+	int arr[n];
+	char currentCell;
+	int initHealthy = 0;
+	int maxHealthy = 0;
+	for (int i = 0; i < n; i++) {
+		cin >> currentCell;
+		if (currentCell == 'H') {
+			arr[i] = -1;
+			initHealthy++;
+		}
+		else {
+			arr[i] = 1;
+		}
+	}
+	
+	int best = 0, sum = 0;
+        for (int k = 0; k < n; k++) {
+            sum = max(arr[k],sum+arr[k]);
+            best = max(best,sum);
+        }
+
+        cout << best + initHealthy << '\n';	
+}
+
+int main() {
+	int T;
+	cin >> T;
+	while (T--) {
+		applyDrug();
+	}
+}
+

@@ -1,0 +1,142 @@
+function ObstacleSet.new 0
+push constant 1
+call Memory.alloc 1
+pop pointer 0
+call Obstacle.new 0
+pop this 0
+push pointer 0
+return
+function ObstacleSet.dispose 0
+push argument 0
+pop pointer 0
+push this 0
+call Obstacle.dispose 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function ObstacleSet.run 0
+push argument 0
+pop pointer 0
+push this 0
+push argument 1
+call Obstacle.run 2
+pop temp 0
+push pointer 0
+push argument 1
+call ObstacleSet.handleCollision 2
+pop temp 0
+push constant 0
+return
+function ObstacleSet.fire 0
+push argument 0
+pop pointer 0
+push this 0
+call Obstacle.getActive 1
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 0
+push argument 1
+push argument 2
+push argument 3
+call Obstacle.fire 4
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function ObstacleSet.collision 4
+push argument 0
+pop pointer 0
+push argument 1
+call Obstacle.getActive 1
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push argument 2
+call Jumper.getAlive 1
+not
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+return
+label IF_FALSE1
+push argument 1
+call Obstacle.getX 1
+pop local 0
+push argument 1
+call Obstacle.getY 1
+pop local 1
+push argument 2
+call Jumper.getX 1
+pop local 2
+push argument 2
+call Jumper.getheight 1
+pop local 3
+push local 3
+push constant 10
+lt
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 0
+push local 2
+push constant 32
+add
+lt
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push local 0
+push local 2
+push constant 32
+sub
+gt
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 0
+not
+return
+label IF_FALSE4
+label IF_FALSE3
+label IF_FALSE2
+push constant 0
+return
+function ObstacleSet.kill 0
+push argument 0
+pop pointer 0
+push argument 2
+call Jumper.kill 1
+pop temp 0
+push argument 1
+call Obstacle.deactivate 1
+pop temp 0
+push constant 0
+return
+function ObstacleSet.handleCollision 0
+push argument 0
+pop pointer 0
+push pointer 0
+push this 0
+push argument 1
+call ObstacleSet.collision 3
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+push this 0
+push argument 1
+call ObstacleSet.kill 3
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
