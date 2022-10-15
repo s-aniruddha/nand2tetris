@@ -6,7 +6,7 @@ The **projects 1 - 6** are from the part I of the course. I used python to write
 
 The **projects 7 - 12** are from the part II of the course. As in the part I, I used python to write the Jack compiler, VM translator and Jack analyzer.
 
-**[Project 9](/projects/09/project9/source)** is a basic runner game (similar to Google's Trex run) that I wrote in the Jack language (peer reviewed project)
+**[Project 9](/projects/09/project9/source)** is a basic runner game (similar to Google's Trex run) that I wrote in the Jack language (peer reviewed project).
 
 
 ![Screenshot](projects/09/project9/source/Screenshot.png)
