@@ -9,7 +9,7 @@ The **projects 7 - 12** are from the part II of the course. As in the part I, I 
 **Project 9** is a basic runner game (similar to Google's Trex run) that I wrote in the Jack language (peer reviewed project)
 
 
-![Screenshot](blob/master/projects/09/project9/source/Screenshot.png)
+![Screenshot](projects/09/project9/source/Screenshot.png)
 
 
 [Build a Modern Computer from First Principles: From Nand to Tetris](https://www.coursera.org/learn/build-a-computer)  
