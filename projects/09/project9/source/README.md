@@ -6,9 +6,11 @@ Please use no animation mode in VM emulator.
 While there is game room for improvement in terms of the no of obstacles and
 graphics of the game interface, the basic features of the game are captured in Jack code. 
 
-Screenshot from the app: ![Screenshot](Screenshot.png)
+### Screenshot from the app: 
 
-How to play:
+![Screenshot](Screenshot.png)
+
+### How to play:
 
 Use the up arrow to make the character jump. The aim of the game is to avoid
 as many obstacles (Rectangle) possible. The position of the jumper is reset every time 
